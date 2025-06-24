@@ -48,7 +48,7 @@ def preprocess_dataframe(df: pd.DataFrame) -> pd.DataFrame:
 
     df["tokens"] = df["cleaned_message"].apply(amharic_tokenize)
 
-    return df[["ID", "Channel Title", "Channel Username", "Date", "cleaned_message", "Views", "tokens"]]
+    return df[["ID", "Channel Title", "Channel Username", "Date", "cleaned_message", "tokens"]]
 
 def save_cleaned_data(df: pd.DataFrame, filepath: str):
     df.to_csv(filepath, index=False)
