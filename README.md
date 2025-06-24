@@ -1,65 +1,139 @@
-# Ecommerce Amharic NER Project 🇪🇹🛒
+# Amharic E-commerce NER & Vendor Scorecard 🇪🇹
 
-Extracting Product Intelligence from Telegram-based E-Commerce Posts in Amharic
+Extracting Structured Product Intelligence from Telegram E-commerce Channels  
+**Named Entity Recognition (NER) + Vendor Analytics + Micro-Lending Scorecard**
 
 ---
 
 ## Project Overview
 
-Ecommerce is building an NLP pipeline to extract structured information from unstructured Telegram messages posted by Amharic-speaking e-commerce vendors. The goal is to identify key entities:
+This project builds an NLP pipeline to extract and analyze e-commerce information from **Amharic-language Telegram posts**. The system performs:
 
-- 🛍️ `PRODUCT`  
-- 💰 `PRICE`  
-- 📍 `LOCATION`  
-- 📞 `CONTACT`  
+- 📌 **Named Entity Recognition (NER)** to identify key entities:
+  - 🛍️ `PRODUCT` – items being sold
+  - 💰 `PRICE` – numerical price values (e.g., "6500 ብር")
+  - 📍 `LOCATION` – delivery/meeting/store areas
+  - 📞 `CONTACT` – phone numbers
 
-The extracted information will support vendor scorecards, analytics dashboards, and intelligent recommendations.
+- **FinTech Vendor Scorecard** to assess vendor activity, engagement, and pricing and identify top-performing microbusinesses eligible for **micro-lending** based on engagement and product insights.
 
 ---
 
 ## Quick Start
 
-### Install Dependencies
+### 1. Install Dependencies
 
-    pip install -r requirements.txt
+```bash
+pip install -r requirements.txt
+````
 
-### Run Labeling Pipeline
-    ```
-    python scripts/run_preprocessing.py
-        then
-    python scripts/run_ner_labeling.py
+### 2. Run the Preprocessing & Labeling Pipeline
 
-    ```
+```bash
+python scripts/run_preprocessing.py
+python scripts/run_ner_labeling.py
+```
 
+These scripts clean and tokenize Telegram messages and output weakly labeled data in **CoNLL format** (`labeled_data.conll`).
 
-    This loads the cleaned Telegram dataset and outputs labeled_data.conll in CoNLL format.
+---
 
-## Methods
+## Pipeline Components
 
-* used a scalable, rule-based labeling system:
+### Data Preprocessing
 
-    PRODUCT - keyword anchors (e.g., juicer, ማሽን, dispenser)
+* Scraped Telegram posts using Telethon
+* Cleaned noise, removed emojis, normalized text
 
-    PRICE - regex for “6800 ብር”, “ዋጋ 5000”
+### Rule-based Weak Labeling
 
-    LOCATION - keyword-based clues like ፎቅ, ሞል, ቦታ
+Custom heuristics for each entity:
 
-    CONTACT - regex for phone numbers (e.g., 0912345678)
+| Entity   | Strategy                                  |
+| -------- | ----------------------------------------- |
+| PRODUCT  | Keyword anchor matching (e.g., ማሽን, ጫማ)   |
+| PRICE    | Regex on digits + ብር / ዋጋ                 |
+| LOCATION | Clue phrases (e.g., ቦታ, አድራሻ ሞል)           |
+| CONTACT  | Regex (e.g., 09xx,07xx,251 numbers) |
 
-* Labels follow the BIO scheme (B-, I-, O) for multi-token phrases.
+* BIO format applied to support model training (`B-`, `I-`, `O`)
+
+### NER Model Training
+
+* Used 🤗 HuggingFace transformers
+* Fine-tuned multilingual models:
+
+  * `rasyosef/bert-tiny-amharic`
+  * `Davlan/distilbert-base-multilingual-cased-ner-hrl`
+  * `mbeukman/xlm-roberta-base-finetuned-ner-swahili`
+* Trained on `labeled_data.conll`
+
+### Model Comparison
+
+| Model Name                                          | Type                              | Weighted F1 | `PRODUCT` F1 | Notes                      |
+| --------------------------------------------------- | --------------------------------- | ----------- | ------------ | -------------------------- |
+| `rasyosef/bert-tiny-amharic`                        | Tiny BERT (Amharic)               | **0.95**    | 0.64         | Fast, efficient            |
+| `Davlan/distilbert-base-multilingual-cased-ner-hrl` | DistilBERT (multilingual)         | **0.95**    | 0.74         | Strong PRODUCT performance |
+| `mbeukman/xlm-roberta-base-finetuned-ner-swahili`   | XLM-RoBERTa (multilingual, large) | **0.95**    | **0.78**     | Best PRODUCT recall        |
+
+[✓] **Selected**: `rasyosef/bert-tiny-amharic` – lightweight & excellent CONTACT/LOCATION accuracy
+
+### Model Interpretability
+
+* Used attention visualization + SHAP/LIME to explain decisions
+* Identified model weaknesses (e.g., ambiguous PRODUCTs)
+
+---
+
+## FinTech Vendor Scorecard
+
+Combined **NER outputs + Telegram metadata** to generate vendor-level microbusiness profiles.
+
+### Key Metrics:
+
+| Metric              | Description                                     |
+| ------------------- | ----------------------------------------------- |
+| **Posts/Week**      | Consistency of business activity                |
+| **Avg Views/Post**  | Audience engagement & potential market size     |
+| **Avg Price (ETB)** | Product pricing profile                         |
+| **Top Post**        | Highest view count + associated product & price |
+| **Lending Score**   | Custom score: `0.5 * Views + 0.5 * Posts/Week`  |
+
+### Scorecard Summary:
+
+| Vendor         | Avg Views | Posts/Week | Avg Price (ETB) | Lending Score |
+| -------------- | --------- | ---------- | --------------- | ------------- |
+| `@ethio_brand_collection`   | 36,957    | 7.89       | 2,274           | **18,482.86** |
+| `@ZemenExpress`   | 13,114    | 23.34      | 1,812           | 6,568.82      |
+| `@Shageronlinestore` | 13,028    | 27.67      | 2,102           | 6,528.15      |
+| `@nevacomputer`  | 5,359     | 7.49       | 34,055          | 2,683.56      |
+| `@meneshayeofficial`  | 2,748     | 6.35       | 4,813           | 1,377.37      |
+
+---
 
 ## Outputs
 
-    telegram_data_cleaned.csv: Cleaned and tokenized messages
+* `data/raw/telegram_data.csv` – raw scraped Telegram posts
+* `data/processed/telegram_data_cleaned.csv` – cleaned messages
+* `data/outputs/labeled_data.conll` – weakly labeled NER dataset
+* `models/` – fine-tuned models (Google Drive)
+* `reports/final_report.pdf` – full PDF report with visuals
+* `notebooks/vendor_scorecard_visuals.ipynb` – summary dashboard notebook
 
-    labeled_data.conll: Weakly labeled training data for NER models
+---
 
 ## Next Steps
 
-    Manual validation of labeling
+* Deploy inference API or Streamlit app
+* Use feedback from lenders to refine score logic
+* Explore expansion to other local languages & platforms (e.g., Facebook)
 
-    Fine-tuning a BERT-based Amharic NER model
+---
 
-    Model evaluation and interpretability
+## Acknowledgments
 
-    Entity-based analytics & dashboards
+* Amharic NLP community for open-source models (rasyosef, Davlan, mbeukman)
+* Telethon & HuggingFace for enabling Telegram + NER pipelines
+
+---
+
