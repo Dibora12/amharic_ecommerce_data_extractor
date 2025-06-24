@@ -1,4 +1,4 @@
-# Amharic E-commerce NER & Vendor Scorecard 🇪🇹
+# Amharic E-commerce NER & Vendor Scorecard 🇪🇹🇪🇹
 
 Extracting Structured Product Intelligence from Telegram E-commerce Channels  
 **Named Entity Recognition (NER) + Vendor Analytics + Micro-Lending Scorecard**
