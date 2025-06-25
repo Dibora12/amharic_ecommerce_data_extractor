@@ -9,7 +9,7 @@ Extracting Structured Product Intelligence from Telegram E-commerce Channels
 
 This project builds an NLP pipeline to extract and analyze e-commerce information from **Amharic-language Telegram posts**. The system performs:
 
-- 📌 **Named Entity Recognition (NER)** to identify key entities:
+ 📌 **Named Entity Recognition (NER)** to identify key entities:
   - 🛍️ `PRODUCT` – items being sold
   - 💰 `PRICE` – numerical price values (e.g., "6500 ብር")
   - 📍 `LOCATION` – delivery/meeting/store areas
@@ -17,7 +17,6 @@ This project builds an NLP pipeline to extract and analyze e-commerce informatio
 
 - **FinTech Vendor Scorecard** to assess vendor activity, engagement, and pricing and identify top-performing microbusinesses eligible for **micro-lending** based on engagement and product insights.
 
----
 
 ## Quick Start
 
@@ -36,7 +35,6 @@ python scripts/run_ner_labeling.py
 
 These scripts clean and tokenize Telegram messages and output weakly labeled data in **CoNLL format** (`labeled_data.conll`).
 
----
 
 ## Pipeline Components
 
@@ -83,7 +81,7 @@ Custom heuristics for each entity:
 * Used attention visualization + SHAP/LIME to explain decisions
 * Identified model weaknesses (e.g., ambiguous PRODUCTs)
 
----
+
 
 ## FinTech Vendor Scorecard
 
@@ -109,7 +107,7 @@ Combined **NER outputs + Telegram metadata** to generate vendor-level microbusin
 | `@nevacomputer`  | 5,359     | 7.49       | 34,055          | 2,683.56      |
 | `@meneshayeofficial`  | 2,748     | 6.35       | 4,813           | 1,377.37      |
 
----
+
 
 ## Outputs
 
@@ -120,7 +118,7 @@ Combined **NER outputs + Telegram metadata** to generate vendor-level microbusin
 * `reports/final_report.pdf` – full PDF report with visuals
 * `notebooks/vendor_scorecard_visuals.ipynb` – summary dashboard notebook
 
----
+
 
 ## Next Steps
 
@@ -128,12 +126,10 @@ Combined **NER outputs + Telegram metadata** to generate vendor-level microbusin
 * Use feedback from lenders to refine score logic
 * Explore expansion to other local languages & platforms (e.g., Facebook)
 
----
 
 ## Acknowledgments
 
 * Amharic NLP community for open-source models (rasyosef, Davlan, mbeukman)
 * Telethon & HuggingFace for enabling Telegram + NER pipelines
 
----
 
